@@ -1,0 +1,34 @@
+{
+  "entity": {
+    "binary_sensor": {
+      "receiving": {
+        "default": "mdi:television-shimmer",
+        "state": { "off": "mdi:television-off" }
+      }
+    },
+    "sensor": {
+      "state": {
+        "default": "mdi:television-ambient-light",
+        "state": {
+          "setup": "mdi:cog-outline",
+          "off": "mdi:power-off",
+          "waiting": "mdi:timer-sand",
+          "connecting": "mdi:lan-pending",
+          "streaming": "mdi:television-ambient-light",
+          "restoring": "mdi:lightbulb-auto",
+          "retrying": "mdi:refresh",
+          "stopped": "mdi:stop-circle-outline",
+          "error": "mdi:alert-circle-outline"
+        }
+      },
+      "area": { "default": "mdi:sofa" },
+      "service_started": { "default": "mdi:restart" }
+    },
+    "switch": {
+      "sync": {
+        "default": "mdi:television-ambient-light",
+        "state": { "off": "mdi:television" }
+      }
+    }
+  }
+}

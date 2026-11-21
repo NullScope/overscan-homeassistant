@@ -1,0 +1,12 @@
+{
+  "domain": "overscan",
+  "name": "Overscan",
+  "codeowners": ["@NullScope"],
+  "config_flow": true,
+  "documentation": "https://github.com/NullScope/overscan-homeassistant",
+  "integration_type": "device",
+  "iot_class": "local_polling",
+  "issue_tracker": "https://github.com/NullScope/overscan-homeassistant/issues",
+  "requirements": [],
+  "version": "1.0.0"
+}

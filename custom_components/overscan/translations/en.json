@@ -1,0 +1,85 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Find Overscan on your TV",
+        "description": "Enter the TV's IP address. Overscan shows it under Help & details → Home automation. Home Assistant connects to port {port}.",
+        "data": { "host": "IP address" },
+        "data_description": { "host": "For example 192.168.1.20. Give the TV a fixed address in your router so it doesn't change." }
+      },
+      "pair": {
+        "title": "Pair with the TV",
+        "description": "On the TV at {host}, open Overscan → Help & details → Home automation and keep the page open. Enter the six-character code it shows.",
+        "data": { "code": "Pairing code", "name": "Device name" },
+        "data_description": {
+          "code": "Letters and digits; case doesn't matter. The code works only while the page is open.",
+          "name": "How the TV lists Home Assistant. Each paired device needs a different name."
+        }
+      },
+      "reauth_confirm": {
+        "title": "Pair with the TV again",
+        "description": "The TV at {host} no longer accepts Home Assistant's key, for example after Forget devices. Open Overscan → Help & details → Home automation and enter the code it shows.",
+        "data": { "code": "Pairing code", "name": "Device name" },
+        "data_description": {
+          "code": "Letters and digits; case doesn't matter. The code works only while the page is open.",
+          "name": "How the TV lists Home Assistant. Each paired device needs a different name."
+        }
+      },
+      "reconfigure": {
+        "title": "Change the TV's address",
+        "description": "Enter the TV's new IP address. Overscan shows it under Help & details → Home automation. The pairing is kept.",
+        "data": { "host": "IP address" },
+        "data_description": { "host": "For example 192.168.1.20." }
+      }
+    },
+    "error": {
+      "cannot_connect": "Couldn't reach Overscan at this address. Check the address, that the TV is on the same network, and that Overscan 1.2.4 or later has been opened once since it was installed.",
+      "not_overscan": "Something answered at this address, but it isn't Overscan.",
+      "invalid_code": "Wrong or expired code. Keep Help & details → Home automation open on the TV and enter the code it shows now.",
+      "invalid_name": "Use 1 to 64 plain letters, digits, spaces or symbols, without \", \\ or :.",
+      "name_taken": "The TV already has a device with this name. Choose another name, or use Forget devices on the TV first.",
+      "pairing_unsupported": "This version of Overscan can't pair. Update Overscan on the TV.",
+      "register_failed": "The TV couldn't save the pairing. Try again.",
+      "unknown": "Unexpected error. Check the logs."
+    },
+    "abort": {
+      "already_configured": "This TV is already added.",
+      "reauth_successful": "Paired again.",
+      "reconfigure_successful": "The address was changed."
+    }
+  },
+  "entity": {
+    "binary_sensor": {
+      "receiving": { "name": "Receiving picture" }
+    },
+    "sensor": {
+      "state": {
+        "name": "Sync state",
+        "state": {
+          "setup": "Setup needed",
+          "off": "Off",
+          "waiting": "Waiting",
+          "connecting": "Connecting",
+          "streaming": "Streaming",
+          "restoring": "Restoring lights",
+          "retrying": "Retrying",
+          "stopped": "Stopped",
+          "error": "Error"
+        }
+      },
+      "area": { "name": "Entertainment area" },
+      "service_started": { "name": "Service started" }
+    },
+    "switch": {
+      "sync": { "name": "Sync" }
+    }
+  },
+  "exceptions": {
+    "update_failed": { "message": "Couldn't read the sync state: {error}" },
+    "auth_failed": { "message": "The TV no longer accepts Home Assistant's key. Pair again from the notification in Settings → Devices & services." },
+    "refused": { "message": "The TV can't change sync now: {reason}" },
+    "unsupported": { "message": "This version of Overscan can't be controlled from Home Assistant. Update Overscan on the TV." },
+    "cannot_connect": { "message": "Couldn't reach the TV: {error}" },
+    "command_failed": { "message": "The TV couldn't change sync: {error}" }
+  }
+}
