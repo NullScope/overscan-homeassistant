@@ -52,6 +52,7 @@ async def test_entities_show_status(hass: HomeAssistant, mock_tv: MockTv) -> Non
     assert hass.states.get("sensor.overscan_sync_state").state == "streaming"
     assert hass.states.get("binary_sensor.overscan_receiving_picture").state == "on"
     assert hass.states.get("sensor.overscan_entertainment_area").state == "Living room"
+    assert hass.states.get("sensor.overscan_screen").state == "on"
     assert hass.states.get("sensor.overscan_service_started").state not in ("unknown", "unavailable")
 
     assert await hass.config_entries.async_unload(entry.entry_id)
@@ -60,8 +61,25 @@ async def test_entities_show_status(hass: HomeAssistant, mock_tv: MockTv) -> Non
 
 async def test_unknown_state_is_unknown(hass: HomeAssistant, mock_tv: MockTv) -> None:
     mock_tv.status["state"] = "something-new"
+    mock_tv.status["screen"] = "unknown"
     await _paired_entry(hass, mock_tv)
     assert hass.states.get("sensor.overscan_sync_state").state == "unknown"
+    assert hass.states.get("sensor.overscan_screen").state == "unknown"
+
+
+async def test_switch_refuses_while_screen_is_off(hass: HomeAssistant, mock_tv: MockTv) -> None:
+    await _paired_entry(hass, mock_tv)
+    assert hass.states.get("sensor.overscan_screen").state == "on"
+
+    # The screen goes off between polls: the TV refuses, and the sensor catches up.
+    mock_tv.status["screen"] = "off"
+    with pytest.raises(HomeAssistantError) as err:
+        await _switch(hass, SERVICE_TURN_ON)
+    assert err.value.translation_key == "screen_off"
+    await hass.async_block_till_done()
+    assert mock_tv.status["enabled"] is False
+    assert hass.states.get("switch.overscan_sync").state == "off"
+    assert hass.states.get("sensor.overscan_screen").state == "off"
 
 
 async def test_switch_starts_and_stops_sync(hass: HomeAssistant, mock_tv: MockTv) -> None:

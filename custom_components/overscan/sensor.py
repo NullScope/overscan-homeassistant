@@ -12,7 +12,7 @@ from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 from homeassistant.util import dt as dt_util
 
-from .api import OverscanStatus
+from .api import SCREEN_STATES, OverscanStatus
 from .const import SYNC_STATES
 from .coordinator import OverscanConfigEntry, OverscanCoordinator
 from .entity import OverscanEntity
@@ -44,6 +44,14 @@ AREA = OverscanSensorDescription(
     translation_key="area",
     value_fn=lambda status: status.area,
 )
+SCREEN = OverscanSensorDescription(
+    key="screen",
+    translation_key="screen",
+    device_class=SensorDeviceClass.ENUM,
+    options=list(SCREEN_STATES),
+    # Unknown where the TV doesn't report it or Overscan predates the field.
+    value_fn=lambda status: status.screen,
+)
 SERVICE_STARTED = SensorEntityDescription(
     key="service_started",
     translation_key="service_started",
@@ -61,6 +69,7 @@ async def async_setup_entry(
         [
             OverscanSensor(coordinator, STATE),
             OverscanSensor(coordinator, AREA),
+            OverscanSensor(coordinator, SCREEN),
             OverscanServiceStartedSensor(coordinator, SERVICE_STARTED),
         ]
     )

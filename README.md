@@ -69,13 +69,19 @@ After five wrong attempts, the TV shows a new one.
 | **Sync state** (sensor) | Setup needed, Off, Waiting, Connecting, Streaming, Restoring lights, Retrying, Stopped or Error |
 | **Receiving picture** (binary sensor) | On while picture colors are arriving from the TV |
 | **Entertainment area** (sensor) | The Hue Entertainment area Overscan uses |
+| **Screen** (sensor) | On, Dimmed or Off, from the TV's display state. Unknown on TVs that don't report it |
 | **Service started** (diagnostic sensor) | When Overscan's service on the TV last started |
 
 The state is read every 10 seconds and right after the switch is used. When the
 TV is unplugged or off the network, the entities become unavailable.
 
-If the TV can't start sync, for example because setup isn't finished or no room
-is chosen, turning the switch on shows the TV's reason.
+The TV doesn't start sync while its screen is off, so an automation can't light
+the room for a TV in standby. Turning the switch on then shows an error, and
+the Screen sensor shows Off. Turning sync off always works. On TVs that don't
+report their screen state, starting isn't blocked.
+
+If the TV can't start sync for another reason, for example because setup isn't
+finished or no room is chosen, turning the switch on shows the TV's reason.
 
 ### Example: sync while a console is on
 

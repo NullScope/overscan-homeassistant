@@ -15,6 +15,7 @@ from .api import (
     OverscanConnectionError,
     OverscanError,
     OverscanRefusedError,
+    OverscanScreenOffError,
     OverscanUnsupportedError,
 )
 from .const import DOMAIN
@@ -35,7 +36,10 @@ async def async_setup_entry(
 
 
 class OverscanSyncSwitch(OverscanEntity, SwitchEntity):
-    """On while sync is switched on, as with the TV menu's Start and Stop."""
+    """On while sync is switched on, as with the TV menu's Start and Stop.
+
+    The TV refuses to start while its screen is off; stopping always works.
+    """
 
     @property
     def is_on(self) -> bool:
@@ -55,6 +59,11 @@ class OverscanSyncSwitch(OverscanEntity, SwitchEntity):
             # The TV forgot this device, so pairing again is the only fix.
             self.coordinator.config_entry.async_start_reauth(self.hass)
             raise HomeAssistantError(translation_domain=DOMAIN, translation_key="auth_failed") from err
+        except OverscanScreenOffError as err:
+            # The TV won't light the room while its screen is off; show the
+            # screen state it reports now.
+            await self.coordinator.async_request_refresh()
+            raise HomeAssistantError(translation_domain=DOMAIN, translation_key="screen_off") from err
         except OverscanRefusedError as err:
             raise HomeAssistantError(
                 translation_domain=DOMAIN, translation_key="refused", translation_placeholders={"reason": str(err)}

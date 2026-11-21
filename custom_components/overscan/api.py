@@ -72,6 +72,19 @@ class OverscanRefusedError(OverscanError):
     """Sync cannot change now: setup isn't finished, no room is chosen, or no capture."""
 
 
+class OverscanScreenOffError(OverscanRefusedError):
+    """The TV refused /start because its screen is off."""
+
+
+# The 409 message /start gives while the screen is off (ServiceApp.SetSyncFromApi).
+_SCREEN_OFF_MESSAGE = "the TV screen is off"
+
+SCREEN_ON = "on"
+SCREEN_DIM = "dim"
+SCREEN_OFF = "off"
+SCREEN_STATES = (SCREEN_ON, SCREEN_DIM, SCREEN_OFF)
+
+
 @dataclass(frozen=True, slots=True)
 class OverscanStatus:
     """The reply to ``GET /status``."""
@@ -80,6 +93,9 @@ class OverscanStatus:
     enabled: bool
     receiving: bool
     area: str | None
+    # on, dim or off; None when the TV doesn't report it ("unknown") or the
+    # Overscan version predates the field.
+    screen: str | None
     version: str | None
     service_uptime_seconds: int | None
     started_seconds_after_boot: int | None
@@ -96,6 +112,7 @@ class OverscanStatus:
             enabled=data.get("enabled") is True,
             receiving=data.get("receiving") is True,
             area=_text(data.get("area")),
+            screen=data.get("screen") if data.get("screen") in SCREEN_STATES else None,
             version=_text(data.get("version")),
             service_uptime_seconds=_whole(data.get("service_uptime_seconds")),
             started_seconds_after_boot=_whole(data.get("started_seconds_after_boot")),
@@ -219,6 +236,8 @@ class OverscanClient:
         if status == 200:
             return
         if status == 409:
+            if path == "/start" and message and message.strip().lower() == _SCREEN_OFF_MESSAGE.lower():
+                raise OverscanScreenOffError(message)
             raise OverscanRefusedError(message or "Sync can't change now")
         if status in (404, 405):
             raise OverscanUnsupportedError("This version of Overscan can't be controlled; update it on the TV")

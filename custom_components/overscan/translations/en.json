@@ -68,6 +68,14 @@
         }
       },
       "area": { "name": "Entertainment area" },
+      "screen": {
+        "name": "Screen",
+        "state": {
+          "on": "On",
+          "dim": "Dimmed",
+          "off": "Off"
+        }
+      },
       "service_started": { "name": "Service started" }
     },
     "switch": {
@@ -77,6 +85,7 @@
   "exceptions": {
     "update_failed": { "message": "Couldn't read the sync state: {error}" },
     "auth_failed": { "message": "The TV no longer accepts Home Assistant's key. Pair again from the notification in Settings → Devices & services." },
+    "screen_off": { "message": "The TV's screen is off, so it won't start sync. Turn the screen on first." },
     "refused": { "message": "The TV can't change sync now: {reason}" },
     "unsupported": { "message": "This version of Overscan can't be controlled from Home Assistant. Update Overscan on the TV." },
     "cannot_connect": { "message": "Couldn't reach the TV: {error}" },

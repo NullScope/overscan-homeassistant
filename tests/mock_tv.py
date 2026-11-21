@@ -39,6 +39,7 @@ class MockTv:
             "enabled": False,
             "receiving": False,
             "area": "Living room",
+            "screen": "on",
             "service_uptime_seconds": 120,
             "started_seconds_after_boot": 72,
             "first_launched_by": "system",
@@ -120,6 +121,9 @@ class MockTv:
             )
         if self.refusal:
             return web.json_response({"error": self.refusal}, status=409)
+        # ServiceApp.SetSyncFromApi: /start needs the screen on; /stop always works.
+        if enabled and self.status.get("screen") == "off":
+            return web.json_response({"error": "the TV screen is off"}, status=409)
         self.status["enabled"] = enabled
         self.status["state"] = "connecting" if enabled else "off"
         return web.json_response({"enabled": enabled})

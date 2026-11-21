@@ -13,6 +13,8 @@ from custom_components.overscan.api import (
     OverscanNameError,
     OverscanRefusedError,
     OverscanResponseError,
+    OverscanScreenOffError,
+    OverscanStatus,
     OverscanUnsupportedError,
     digest_response,
     normalize_code,
@@ -60,6 +62,38 @@ def test_code_and_name_rules() -> None:
     assert not valid_name("Home:Assistant")
     assert not valid_name('Home "HA"')
     assert not valid_name("Casa é")
+
+
+def test_screen_field() -> None:
+    base = {"app": "Overscan", "state": "off"}
+    for value in ("on", "dim", "off"):
+        assert OverscanStatus.from_json(base | {"screen": value}).screen == value
+    # "unknown" from TVs that don't report it, and Overscan versions without the field.
+    assert OverscanStatus.from_json(base | {"screen": "unknown"}).screen is None
+    assert OverscanStatus.from_json(base).screen is None
+
+
+async def test_start_refused_while_screen_is_off(mock_tv: MockTv) -> None:
+    async with aiohttp.ClientSession() as session:
+        username, key = await OverscanClient(session, "127.0.0.1", mock_tv.server.port).register("K7Q2MX", "HA")
+        client = OverscanClient(session, "127.0.0.1", mock_tv.server.port, username, key)
+        await client.start()
+        mock_tv.status["screen"] = "off"
+        assert (await client.get_status()).screen == "off"
+
+        # Stopping always works; starting is refused.
+        await client.stop()
+        assert mock_tv.status["enabled"] is False
+        with pytest.raises(OverscanScreenOffError, match="screen is off"):
+            await client.start()
+        assert mock_tv.status["enabled"] is False
+
+        # Other refusals stay generic.
+        mock_tv.status["screen"] = "on"
+        mock_tv.refusal = "choose a room in Overscan on the TV first"
+        with pytest.raises(OverscanRefusedError) as refused:
+            await client.start()
+        assert not isinstance(refused.value, OverscanScreenOffError)
 
 
 async def test_status_register_start_stop(mock_tv: MockTv) -> None:
