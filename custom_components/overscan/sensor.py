@@ -1,4 +1,4 @@
-"""Sync state, Entertainment area and when the TV service started."""
+"""State, Screen, Entertainment area and when the TV service started."""
 
 from __future__ import annotations
 
@@ -42,6 +42,7 @@ STATE = OverscanSensorDescription(
 AREA = OverscanSensorDescription(
     key="area",
     translation_key="area",
+    entity_category=EntityCategory.DIAGNOSTIC,
     value_fn=lambda status: status.area,
 )
 SCREEN = OverscanSensorDescription(

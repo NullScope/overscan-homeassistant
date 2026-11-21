@@ -54,7 +54,7 @@
     },
     "sensor": {
       "state": {
-        "name": "Sync state",
+        "name": "State",
         "state": {
           "setup": "Setup needed",
           "off": "Off",

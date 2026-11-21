@@ -18,9 +18,11 @@ from homeassistant.const import (
     CONF_USERNAME,
     SERVICE_TURN_OFF,
     SERVICE_TURN_ON,
+    EntityCategory,
 )
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import HomeAssistantError
+from homeassistant.helpers import entity_registry as er
 
 from .mock_tv import MockTv
 
@@ -49,11 +51,23 @@ async def test_entities_show_status(hass: HomeAssistant, mock_tv: MockTv) -> Non
     assert entry.state is ConfigEntryState.LOADED
 
     assert hass.states.get("switch.overscan_sync").state == "on"
-    assert hass.states.get("sensor.overscan_sync_state").state == "streaming"
+    assert hass.states.get("sensor.overscan_state").state == "streaming"
     assert hass.states.get("binary_sensor.overscan_receiving_picture").state == "on"
     assert hass.states.get("sensor.overscan_entertainment_area").state == "Living room"
     assert hass.states.get("sensor.overscan_screen").state == "on"
     assert hass.states.get("sensor.overscan_service_started").state not in ("unknown", "unavailable")
+
+    registry = er.async_get(hass)
+    diagnostic = {
+        entity.entity_id
+        for entity in er.async_entries_for_config_entry(registry, entry.entry_id)
+        if entity.entity_category is EntityCategory.DIAGNOSTIC
+    }
+    assert diagnostic == {
+        "binary_sensor.overscan_receiving_picture",
+        "sensor.overscan_entertainment_area",
+        "sensor.overscan_service_started",
+    }
 
     assert await hass.config_entries.async_unload(entry.entry_id)
     assert entry.state is ConfigEntryState.NOT_LOADED
@@ -63,7 +77,7 @@ async def test_unknown_state_is_unknown(hass: HomeAssistant, mock_tv: MockTv) ->
     mock_tv.status["state"] = "something-new"
     mock_tv.status["screen"] = "unknown"
     await _paired_entry(hass, mock_tv)
-    assert hass.states.get("sensor.overscan_sync_state").state == "unknown"
+    assert hass.states.get("sensor.overscan_state").state == "unknown"
     assert hass.states.get("sensor.overscan_screen").state == "unknown"
 
 
@@ -90,7 +104,7 @@ async def test_switch_starts_and_stops_sync(hass: HomeAssistant, mock_tv: MockTv
     await hass.async_block_till_done()
     assert mock_tv.status["enabled"] is True
     assert hass.states.get("switch.overscan_sync").state == "on"
-    assert hass.states.get("sensor.overscan_sync_state").state == "connecting"
+    assert hass.states.get("sensor.overscan_state").state == "connecting"
 
     await _switch(hass, SERVICE_TURN_OFF)
     await hass.async_block_till_done()

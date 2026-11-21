@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from homeassistant.components.binary_sensor import BinarySensorEntity, BinarySensorEntityDescription
+from homeassistant.const import EntityCategory
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 
@@ -11,7 +12,9 @@ from .entity import OverscanEntity
 
 PARALLEL_UPDATES = 0
 
-RECEIVING = BinarySensorEntityDescription(key="receiving", translation_key="receiving")
+RECEIVING = BinarySensorEntityDescription(
+    key="receiving", translation_key="receiving", entity_category=EntityCategory.DIAGNOSTIC
+)
 
 
 async def async_setup_entry(

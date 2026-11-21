@@ -66,10 +66,10 @@ After five wrong attempts, the TV shows a new one.
 | Entity | Shows or does |
 | --- | --- |
 | **Sync** (switch) | On while sync is switched on. Turning it on or off works like Start and Stop in the TV menu |
-| **Sync state** (sensor) | Setup needed, Off, Waiting, Connecting, Streaming, Restoring lights, Retrying, Stopped or Error |
-| **Receiving picture** (binary sensor) | On while picture colors are arriving from the TV |
-| **Entertainment area** (sensor) | The Hue Entertainment area Overscan uses |
+| **State** (sensor) | Setup needed, Off, Waiting, Connecting, Streaming, Restoring lights, Retrying, Stopped or Error |
 | **Screen** (sensor) | On, Dimmed or Off, from the TV's display state. Unknown on TVs that don't report it |
+| **Entertainment area** (diagnostic sensor) | The Hue Entertainment area Overscan uses |
+| **Receiving picture** (diagnostic binary sensor) | On while picture colors are arriving from the TV. Useful when sync is on but the lights don't follow the picture |
 | **Service started** (diagnostic sensor) | When Overscan's service on the TV last started |
 
 The state is read every 10 seconds and right after the switch is used. When the
